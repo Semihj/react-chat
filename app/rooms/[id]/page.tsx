@@ -17,6 +17,25 @@ function Page({}: Props) {
   const socketRef = useRef<Socket | null>(null);
   const scrollRef = useRef(null);
 
+  const getMessages = async () => {
+    try {
+      const res = await fetch(`https://flask-chat-2.onrender.com/room/${params.id}`)
+      
+      const data = await res.json();
+      
+      setMessages(data["messages"]);
+
+    } catch (error) {
+      console.log(error);
+      
+    }
+  }
+  useEffect(() => {
+    getMessages()
+  }, [])
+  
+
+
   useEffect(() => {
     if (!socketRef.current) {
       socketRef.current = io("https://flask-chat-2.onrender.com", {
@@ -76,7 +95,7 @@ function Page({}: Props) {
       {isConnected ? <p>Connected to SocketIO</p> : <p>Connecting...</p>}
       <div className="border p-5 w-full h-[400px] max-w-[500px]  ">
         <div className="flex flex-col gap-2 h-full max-h-[300px] overflow-auto w-full">
-          {messages.map((msg, index) => (
+          {messages?.map((msg, index) => (
             <div key={index} ref={scrollRef} className="">
               <Msg
                 own={name == msg.name}
